@@ -4,20 +4,28 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientHandler {
     private MainServ serv;
     private Socket socket;
+    private String nick;
     DataInputStream in;
     DataOutputStream out;
-    private String nick;
+    // List<String> blackList;
 
-    public  ClientHandler(MainServ serv, Socket socket) {
+
+    public ClientHandler(MainServ serv, Socket socket) {
         try {
             this.serv = serv;
             this.socket = socket;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
+            //    this.blackList = new ArrayList<>();
 
             new Thread(new Runnable() {
                 @Override
@@ -37,13 +45,11 @@ public class ClientHandler {
                                 String currentNick = AuthService.getNickByLoginAndPass(tokens[1], tokens[2]);
                                 // Если верувшаяся из базы данных строка не null делаем следующее -->
                                 if (currentNick != null) {
-                                    if (!serv.isNickBusy(currentNick)) {
+                                    if (!serv.isNickBusyAndExist(currentNick)) {
                                         // Вызываем метод sendMsg c аргуметом /authok
-                                        sendMsg("/authok " + currentNick);
+                                        sendMsg("/authok");
                                         // Присваиваем переменной nick значение строки currentNick
                                         nick = currentNick;
-                                        // Делаем рассылку что такой-то клиент зашел в чат
-                                        serv.broadcastMsg(nick + " зашел в чат");
                                         // Вызываем метод subscribe передавая в качестве
                                         // аргумента текущего клиента
                                         serv.subscribe(ClientHandler.this);
@@ -53,35 +59,55 @@ public class ClientHandler {
                                         sendMsg("Учетная запись уже используется");
                                     }
                                 } else {
-                                        // Если верувшаяся из базы данных строка null делаем следующее -->
-                                        // Вызываем метод sendMsg c аргуметом "Неверный логин/пароль"
-                                        sendMsg("Неверный логин/пароль");
-                                    }
+                                    // Если верувшаяся из базы данных строка null делаем следующее -->
+                                    // Вызываем метод sendMsg c аргуметом "Неверный логин/пароль"
+                                    sendMsg("Неверный логин/пароль");
                                 }
                             }
+                        }
 
 
                         while (true) {
                             // Читаем входящий поток от клиента
                             String str = in.readUTF();
-                            // Выводим в консоль сообщение клиента
-                            System.out.println("Client " + str);
+                            if (str.length() > 25) {
+                                str.split("\n");
+                            }
                             // Проверяем, если сообщение клиента заканчивается /end
                             // оправляем ему сообщение /serverclosed
-                            if (str.equals("/end")) {
-                                out.writeUTF("/serverclosed");
-                                break;
+                            if (str.startsWith("/")) {
+                                if (str.equals("/end")) {
+                                    out.writeUTF("/serverclosed");
+                                    break;
+                                }
+                                // Иначе рассылаем сообщение данного клиента
+                                // всем клиентам на сервере либо одному клиенту
+                                // если это личное сообщение
+                                if (str.startsWith("/w")) {
+                                    // реализация личных сообщений
+                                    String[] tokens = str.split(" ", 3);
+                                    serv.personalMsg(ClientHandler.this, tokens[1], tokens[2]);
+                                }
+                                if (str.startsWith("/blacklist ")) {
+                                    String[] tokens = str.split(" ");
+                                    // проверка что добаляемый в blacklist ник существует
+                                    if (serv.isNickBusyAndExist(tokens[1]) && !getNick().equals(tokens[1])) {
+                                        AuthService.addBlackList(getNick(), tokens[1]);
+                                        //  blackList.add(tokens[1]);
+                                        sendMsg(tokens[1] + " добавлен в черный" + "\n" + " список");
+                                    } else {
+                                        if (getNick().equals(tokens[1])) {
+                                            sendMsg("Нельзя добавлять себя " + "\n" + "в черный список");
+                                        }
+                                        if (!serv.isNickBusyAndExist(tokens[1])) {
+                                            sendMsg("Пользователь под ником " + "\n" + tokens[1] + " не существует");
+                                        }
+                                    }
+                                }
+                            } else {
+                                serv.broadcastMsg(ClientHandler.this, nick + ": " + str);
                             }
-                            // Иначе рассылаем сообщение данного клиента
-                            // всем клиентам на сервере либо одному клиенту
-                            // если это личное сообщение
-                            if (str.startsWith("/w")) {
-                                // реализация личных сообщений
-                                String to = str.split(" ")[1];
-                                String msg = str.split(" ")[2];
-                                serv.personalMsg(ClientHandler.this, to, msg);
-                            } else
-                                serv.broadcastMsg("[" + getNick() + "] " + str);
+                            System.out.println("Client: " + str);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -131,5 +157,23 @@ public class ClientHandler {
 }
 
 
+
+//    public static String getNickByLoginAndPass(String login, String pass) {
+//        try {
+//            ResultSet rs = stmt.executeQuery("SELECT nickname, password FROM users WHERE login = '" + login + "'");
+//            int myHash = pass.hashCode();
+//            // 106438208
+//            if (rs.next()) {
+//                String nick = rs.getString(1);
+//                int dbHash = rs.getInt(2);
+//                if (myHash == dbHash) {
+//                    return nick;
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 

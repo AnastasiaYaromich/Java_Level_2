@@ -1,12 +1,14 @@
 package Chat.Client;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 import java.io.DataInputStream;
@@ -40,6 +42,9 @@ public class Controller {
     @FXML
     Button authButton;
 
+    @FXML
+    ListView<String> clientsList;
+
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
@@ -59,11 +64,15 @@ public class Controller {
             upperPanel.setManaged(true);
             bottomPanel.setVisible(false);
             bottomPanel.setManaged(false);
+            clientsList.setVisible(false);
+            clientsList.setManaged(false);
         } else {
             upperPanel.setVisible(false);
             upperPanel.setManaged(false);
             bottomPanel.setVisible(true);
             bottomPanel.setManaged(true);
+            clientsList.setVisible(true);
+            clientsList.setManaged(true);
         }
     }
 
@@ -103,11 +112,20 @@ public class Controller {
                             // serverclosed завершаем работу
                             String str = in.readUTF();
                             if (str.equals("/serverclosed")) {
-                           //     out.writeUTF("/end");
                                 break;
                             }
-                            // Добавляем в textArea сообщение /serverclosed
-                            textArea.appendText(str + "\n");
+                            if (str.startsWith("/clientslist ")) {
+                                String[] tokens = str.split(" ");
+                                Platform.runLater(() -> {
+                                    clientsList.getItems().clear();
+                                    for (int i = 1; i < tokens.length; i++) {
+                                        clientsList.getItems().add(tokens[i]);
+                                    }
+                                });
+                                // Добавляем в textArea сообщение /serverclosed
+                            } else {
+                                textArea.appendText(str + "\n");
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -134,8 +152,6 @@ public class Controller {
             // Клиент написал сообщение в textField
             // и нажал конпку Send.
             // отправляем сообщение на сервер
-//            String clMsg = textField.getText();
-//            if (clMsg == )
             out.writeUTF(textField.getText());
             textField.clear();
             textField.requestFocus();

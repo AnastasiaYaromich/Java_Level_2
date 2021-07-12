@@ -5,10 +5,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
 
-
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ListView?>
 
 <?import java.net.URL?>
-<?import javafx.scene.control.PasswordField?>
+
 
 <VBox fx:controller="Chat.Client.Controller"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
@@ -20,11 +21,20 @@
 <Button text="Auth" fx:id = "authButton" onAction="#tryToAuth"/>
 </HBox>
 
-<TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
 
+        <HBox VBox.vgrow="ALWAYS">
+                <VBox HBox.hgrow="ALWAYS">
+<TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
 <HBox fx:id="bottomPanel" managed="false" visible="false">
 <TextField fx:id="textField" HBox.hgrow="ALWAYS"
            promptText="Введите сообщение..." onAction="#sendMsg"/>
 <Button fx:id="sendButton" text="Send" onAction="#sendMsg"/>
 </HBox>
-        </VBox>
+                </VBox>
+                <ListView fx:id="clientsList" prefWidth="350" managed="false" visible="false"/>
+                <!--                  onMouseClicked="#selectClient"-->
+                <!--                  prefWidth="200" />-->
+
+    </HBox>
+
+</VBox>
