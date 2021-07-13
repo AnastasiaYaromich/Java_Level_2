@@ -4,9 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +16,13 @@ public class ClientHandler {
     DataOutputStream out;
     // List<String> blackList;
 
+    // Создаем ссылку на объект, который позволяет установить соединение
+    // между сервером и базой данных
+    private static Connection connection;
+
+    // Создаем ссылку на объект, с помощью которого мы сможем
+    // создавать запросы к базе данных и получать результат из базы
+    private static Statement stmt;
 
     public ClientHandler(MainServ serv, Socket socket) {
         try {
@@ -147,6 +152,10 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
+
+
+
 
     public String getNick() {
         return nick;

@@ -29,23 +29,25 @@ public class AuthService {
         }
     }
 
-        public static void addBlackList(String usernick, String blackusernick) {
-            try {
-                ResultSet rs1 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
-                int userId = rs1.getInt(1);
+    public static void addBlackList(String usernick, String blackusernick) {
+        try {
+            ResultSet rs1 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
+            int userId = rs1.getInt(1);
 
-                ResultSet rs2 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
-                int blackuserId = rs2.getInt(1);
+            ResultSet rs2 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
+            int blackuserId = rs2.getInt(1);
 
-               String query1 = "INSERT INTO blacklist (user_id, blackuser_id) VALUES (?, ?);";
-               PreparedStatement ps1 = connection.prepareStatement(query1);
-                ps1.setInt(1, userId);
-                ps1.setInt(2, blackuserId);
-                ps1.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            String query1 = "INSERT INTO blacklist (user_id, blackuser_id) VALUES (?, ?);";
+            PreparedStatement ps1 = connection.prepareStatement(query1);
+            ps1.setInt(1, userId);
+            ps1.setInt(2, blackuserId);
+            ps1.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+    }
+
+
 
 
     public static void addUser(String login, String pass, String nick) {
@@ -61,30 +63,6 @@ public class AuthService {
         }
     }
 
-
-    public static boolean checkBlackList(String usernick, String  blackusernick) {
-        try {
-
-            ResultSet rs3 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
-            int userId = rs3.getInt(1);
-
-            ResultSet rs4 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
-            int blackuserId = rs4.getInt(1);
-
-            ResultSet rs5 = stmt.executeQuery("SELECT blackuser_id FROM blacklist WHERE user_id = '" + userId + "'");
-
-
-                if (rs5.next()) {
-                   int blackuser1Id = rs5.getInt(1);
-                   if (blackuserId == blackuser1Id) {
-                     return true;
-    }
-}
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-      return false;
-    }
 
     public static String getNickByLoginAndPass(String login, String pass) {
         try {
@@ -102,6 +80,31 @@ public class AuthService {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public static boolean checkBlackList(String usernick, String  blackusernick) {
+        try {
+
+            ResultSet rs3 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
+            int userId = rs3.getInt(1);
+
+            ResultSet rs4 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
+            int blackuserId = rs4.getInt(1);
+
+            ResultSet rs5 = stmt.executeQuery("SELECT blackuser_id FROM blacklist WHERE user_id = '" + userId + "'");
+
+
+            if (rs5.next()) {
+                int blackuser1Id = rs5.getInt(1);
+                if (blackuserId == blackuser1Id) {
+                    return true;
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
     }
 
 // Отключаем соединение с баззой данных
