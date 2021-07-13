@@ -70,9 +70,6 @@ public class ClientHandler {
                         while (true) {
                             // Читаем входящий поток от клиента
                             String str = in.readUTF();
-                            if (str.length() > 25) {
-                                str.split("\n");
-                            }
                             // Проверяем, если сообщение клиента заканчивается /end
                             // оправляем ему сообщение /serverclosed
                             if (str.startsWith("/")) {
@@ -155,25 +152,4 @@ public class ClientHandler {
         return nick;
     }
 }
-
-
-
-//    public static String getNickByLoginAndPass(String login, String pass) {
-//        try {
-//            ResultSet rs = stmt.executeQuery("SELECT nickname, password FROM users WHERE login = '" + login + "'");
-//            int myHash = pass.hashCode();
-//            // 106438208
-//            if (rs.next()) {
-//                String nick = rs.getString(1);
-//                int dbHash = rs.getInt(2);
-//                if (myHash == dbHash) {
-//                    return nick;
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
 

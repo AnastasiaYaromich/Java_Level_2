@@ -31,17 +31,11 @@ public class AuthService {
 
         public static void addBlackList(String usernick, String blackusernick) {
             try {
-               String a = usernick;
-                String b = blackusernick;
-                System.out.println(a);
-                System.out.println(b);
-                ResultSet rs1 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + a + "'");
+                ResultSet rs1 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
                 int userId = rs1.getInt(1);
-                System.out.println(userId);
 
-                ResultSet rs2 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + b + "'");
+                ResultSet rs2 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
                 int blackuserId = rs2.getInt(1);
-                System.out.println(blackuserId);
 
                String query1 = "INSERT INTO blacklist (user_id, blackuser_id) VALUES (?, ?);";
                PreparedStatement ps1 = connection.prepareStatement(query1);
@@ -52,7 +46,6 @@ public class AuthService {
                 e.printStackTrace();
             }
         }
-
 
 
     public static void addUser(String login, String pass, String nick) {
@@ -68,30 +61,30 @@ public class AuthService {
         }
     }
 
-    public static boolean checkBlackList(String usernick, String blackusernick) {
+
+    public static boolean checkBlackList(String usernick, String  blackusernick) {
         try {
-            System.out.println();
-            String c = usernick;
-            String d = blackusernick;
-            System.out.println(c);
-            System.out.println(d);
+
             ResultSet rs3 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + usernick + "'");
+            int userId = rs3.getInt(1);
+
             ResultSet rs4 = stmt.executeQuery("SELECT id FROM users WHERE nickname = '" + blackusernick + "'");
-            int user_id = rs3.getInt(1);
-            int blackuser_id = rs4.getInt(1);
-            ResultSet rs5 = stmt.executeQuery("SELECT blackuser_id FROM blacklist WHERE user_id = '" + user_id + "'");
-            if (rs5.next()) {
-                int blackuser1_id = rs5.getInt(1);
-                if (blackuser_id == blackuser1_id) {
-                    return true;
-                }
-            }
+            int blackuserId = rs4.getInt(1);
+
+            ResultSet rs5 = stmt.executeQuery("SELECT blackuser_id FROM blacklist WHERE user_id = '" + userId + "'");
+
+
+                if (rs5.next()) {
+                   int blackuser1Id = rs5.getInt(1);
+                   if (blackuserId == blackuser1Id) {
+                     return true;
+    }
+}
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
       return false;
     }
-
 
     public static String getNickByLoginAndPass(String login, String pass) {
         try {

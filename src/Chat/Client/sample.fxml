@@ -11,6 +11,7 @@
 <?import java.net.URL?>
 
 
+<?import javafx.scene.control.Label?>
 <VBox fx:controller="Chat.Client.Controller"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
         <stylesheets><URL value="@/css/Style.css"/></stylesheets>
@@ -24,8 +25,11 @@
 
         <HBox VBox.vgrow="ALWAYS">
                 <VBox HBox.hgrow="ALWAYS">
-<TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
+                    <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS"/>
+
 <HBox fx:id="bottomPanel" managed="false" visible="false">
+    <VBox fx:id="chatBox" VBox.vgrow="ALWAYS"/>
+
 <TextField fx:id="textField" HBox.hgrow="ALWAYS"
            promptText="Введите сообщение..." onAction="#sendMsg"/>
 <Button fx:id="sendButton" text="Send" onAction="#sendMsg"/>

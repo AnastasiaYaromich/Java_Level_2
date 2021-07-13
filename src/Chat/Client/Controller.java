@@ -4,18 +4,22 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -48,12 +52,12 @@ public class Controller {
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
+    private int index;
 
     final String IP_ADRESS = "localhost";
     final  int PORT = 8189;
 
     private boolean isAuthorized;
-
 
     // Метод определющий видимость окон в зависимости
     // от состояния авторизации.
@@ -103,9 +107,20 @@ public class Controller {
                             } else {
                                 // Если полученное с сервера сообщение не начинается с authok
                                 // добавляем в textArea сообщение неверный логин и пароль
-                                textArea.appendText(str + "\n");
+//                                msg.add(new Label(str + "\n"));
+//                                if (index % 2 == 0) {
+//                                    msg.get(index).setAlignment(Pos.CENTER_LEFT);
+//                                    System.out.println("1");
+//                                } else {
+//                                    msg.get(index).setAlignment(Pos.CENTER_RIGHT);
+//                                    System.out.println("2");
+                                      textArea.appendText(str + "\n");
+//                                }
+//                                chatBox.getChildren().add(msg.get(index));
+//                                index++;
                             }
                         }
+
                         while (true) {
                             // Читаем входящий поток с сервера
                             // если сообщение сервера содержит строку
@@ -124,7 +139,18 @@ public class Controller {
                                 });
                                 // Добавляем в textArea сообщение /serverclosed
                             } else {
-                                textArea.appendText(str + "\n");
+                             //   textArea.appendText(str + "\n");
+//                                msg.add(new Label(str + "\n"));
+//                                if (index % 2 == 0) {
+//                                    msg.get(index).setAlignment(Pos.CENTER_LEFT);
+//                                    System.out.println("1");
+//                                } else {
+//                                    msg.get(index).setAlignment(Pos.CENTER_RIGHT);
+//                                    System.out.println("2");
+                                       textArea.appendText(str + "\n");
+//                                }
+//                                chatBox.getChildren().add(msg.get(index));
+//                                index++;
                             }
                         }
                     } catch (IOException e) {
